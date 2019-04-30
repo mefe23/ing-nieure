@@ -1,0 +1,91 @@
+import java.util.*;
+
+public class NumberConvertor {
+   
+   // Global değişkenler: sayıları yazıyla yazabilmek için üç farklı liste
+   static String[] listOfDigit_1 = new String[]{"bir ", "iki ", "üç ", "dört ", "beş ", "altı ", "yedi ", "sekiz ", "dokuz "};
+   static String[] listOfDigit_2 = new String[]{"on ", "yirmi ", "otuz ", "kırk ", "elli ", "altmış ", "yetmiş ", "seksen ", "doksan "};
+   static String[] listOfDigit_3 = new String[]{"bin ", "milyon ", "milyar ", "trilyon ", "katrilyon ", "kentilyon "};
+   
+   // Bu metod parametre olarak aldığı sayıyı yazıya çevirir
+   public static String convertor( long number){
+      
+      // Sayı 0'sa istisna olarak 0 döndürülür
+      if( number == 0)
+         return "sıfır";
+      
+      // Sayı sıfır değilse:
+      
+      // Döndürülecek String
+      String writingOfNumber;
+      writingOfNumber = "";
+      
+      // Sayı negatifse "eksi" yazıldıktan sonra pozitif sayı gibi okunur
+      if( number < 0 ){
+         writingOfNumber = "eksi ";
+         number = number * -1;
+      }
+      
+      // sayının basamak sayısını bir değişkende tutulması gerek
+      String num = Long.toString( number);
+      int numberOfDigits = num.length();
+      
+      // Sayılar üçlü gruplar halinde okunduğu için bir "tempGroup" değişkeni oluşturdum
+      long tempGroup;
+      tempGroup = 0;
+      
+      // Üçlü grupları okumak için ayrı bir "temp" değişken tuttum
+      long temp;
+      temp = 0;
+      
+      // Bu döngü çok basamaklı sayıları üçerli gruplara ayırarak okumayı sağlar 
+      for( int j = (numberOfDigits-1) / 3; j >= 0 ; j--){
+         
+         // Sayının basamak sayısı 3'ten büyükse, sayı üçerli gruplara ayrılarak yazılır 
+         if( numberOfDigits > 3)
+            tempGroup = (long) (number / Math.pow(1000.00, (double)(j) ));
+         // Sayının basamak sayısı 3'ten büyük değilse, sayı olduğu gibi yazılır ve döngüye tekrar girmemesi sağlanır
+         else{
+            tempGroup = number;
+            j = -1;
+         }
+         // Bu döngü 0-100 arası sayıları okur yani üç basamaktan oluşan grubu
+         // Döngüde birtakım istisnalar mevcut: örneğin 200 sayısı "iki yüz" şeklinde yazılırken 100 sayısı "bir yüz" olarak yazılmamalı 
+         for( int i = 2; i >= 0; i--){
+            // Sayının belirli bir basamağına erişmek için 10 ve kuvvetlerine bölümğnden kalanı kullandım
+            temp = (long) ( (tempGroup / Math.pow(10.00, (double)i )) ) % 10 ;
+            
+            // Basamakta 0 varsa hiçbir şey yazılmaz
+            if( temp != 0){
+               if( i != 1 & !( i == 2 & temp == 1) & !(i == 0 & temp == 1 & j == 1 ) ){
+                  writingOfNumber += listOfDigit_1[ (int)temp - 1];
+               }
+               if( i == 2)
+                  writingOfNumber += "yüz ";
+               else if( i == 1)
+                  writingOfNumber += listOfDigit_2[ (int)temp - 1];
+            }
+         }
+         
+         // j'nin 0'dan büyük olduğu durumlar için sayının sonuna "bin", "milyon" gibi değerler eklenir
+         // Eğer bu üçlü grup 0'a eşitse bir şey yezılmaz: 100,000,000 sayısı "yüz milyon bin" şeklinde değil "yüz milyon" şeklinde yazılır
+         if( j > 0 & tempGroup % 1000 != 0)
+            writingOfNumber += listOfDigit_3[ j - 1];
+      }
+      return writingOfNumber;
+   }
+   
+   public static void main(String[] args) {
+      
+      System.out.println( "Yazıya dönüştürmek istediğiniz tamsayıları giriniz, çıkmak için -1 yazınız:");
+      Scanner scan = new Scanner(System.in);
+      long number;
+      String writing;
+      
+      do{
+         number = scan.nextLong();
+         writing = convertor( number);
+         System.out.println( writing);
+      }while( number != -1);
+   }
+}
